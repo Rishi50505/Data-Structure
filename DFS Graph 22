@@ -1,0 +1,52 @@
+// DFS Graph Traversal in C
+#include <stdio.h>
+#include <stdbool.h>
+
+#define MAX_VERTICES 10
+
+// Adjacency matrix representation of the graph
+int adj_matrix[MAX_VERTICES][MAX_VERTICES];
+
+// visited array to keep track of visited vertices
+bool visited[MAX_VERTICES];
+
+// Function to print DFS traversal of the graph
+void DFS(int start_vertex) {
+  // Mark the start vertex as visited
+  visited[start_vertex] = true;
+
+  // Print the vertex
+  printf("%d ", start_vertex);
+
+  // Iterate over all the adjacent vertices of the start vertex
+  for (int i = 0; i < MAX_VERTICES; i++) {
+    // If the adjacent vertex is not visited, recursively call DFS on it
+    if (adj_matrix[start_vertex][i] == 1 && !visited[i]) {
+      DFS(i);
+    }
+  }
+}
+
+// Driver code
+int main() {
+  // Initialize the adjacency matrix
+  for (int i = 0; i < MAX_VERTICES; i++) {
+    for (int j = 0; j < MAX_VERTICES; j++) {
+      adj_matrix[i][j] = 0;
+    }
+  }
+
+  // Add edges to the graph
+  adj_matrix[0][1] = 1;
+  adj_matrix[0][2] = 1;
+  adj_matrix[1][3] = 1;
+  adj_matrix[2][4] = 1;
+  adj_matrix[3][5] = 1;
+
+  // Start vertex for DFS traversal
+  int start_vertex = 0;
+
+  // Print DFS traversal of the graph
+  DFS(start_vertex);
+
+  return 
