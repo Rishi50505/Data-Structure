@@ -1,0 +1,129 @@
+
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+  int key;
+  struct Node *left;
+  struct Node *right;
+  int height;
+};
+
+struct Node* createNode(int key) {
+  struct Node* node = (struct Node*)malloc(sizeof(struct Node));
+  node->key = key;
+  node->left = NULL;
+  node->right = NULL;
+  node->height = 1;
+  return node;
+}
+
+int getBalanceFactor(struct Node* node) {
+  if (node == NULL) {
+    return 0;
+  }
+  return node->left->height - node->right->height;
+}
+
+struct Node* rightRotate(struct Node* y) {
+  struct Node* x = y->left;
+  struct Node* T2 = x->right;
+
+  // Perform rotation
+  x->right = y;
+  y->left = T2;
+
+  // Update heights
+  y->height = max(getHeight(y->left), getHeight(y->right)) + 1;
+  x->height = max(getHeight(x->left), getHeight(x->right)) + 1;
+
+  // Return new root
+  return x;
+}
+
+struct Node* leftRotate(struct Node* x) {
+  struct Node* y = x->right;
+  struct Node* T2 = y->left;
+
+  // Perform rotation
+  y->left = x;
+  x->right = T2;
+
+  // Update heights
+  x->height = max(getHeight(x->left), getHeight(x->right)) + 1;
+  y->height = max(getHeight(y->left), getHeight(y->right)) + 1;
+
+  // Return new root
+  return y;
+}
+
+struct Node* insert(struct Node* root, int key) {
+  if (root == NULL) {
+    return createNode(key);
+  }
+
+  if (key < root->key) {
+    root->left = insert(root->left, key);
+  } else {
+    root->right = insert(root->right, key);
+  }
+
+  // Update height of the current node
+  root->height = max(getHeight(root->left), getHeight(root->right)) + 1;
+
+  // Balance the tree
+  int balanceFactor = getBalanceFactor(root);
+
+  if (balanceFactor > 1) {
+    if (key < root->left->key) {
+      return rightRotate(root);
+    } else {
+      root->left = leftRotate(root->left);
+      return rightRotate(root);
+    }
+  } else if (balanceFactor < -1) {
+    if (key > root->right->key) {
+      return leftRotate(root);
+    } else {
+      root->right = rightRotate(root->right);
+      return leftRotate(root);
+    }
+  }
+
+  return root;
+}
+
+struct Node* delete(struct Node* root, int key) {
+  if (root == NULL) {
+    return NULL;
+  }
+
+  if (key < root->key) {
+    root->left = delete(root->left, key);
+  } else if (key > root->key) {
+    root->right = delete(root->right, key);
+  } else {
+    // Node to be deleted is found
+
+    // If the node has no child, simply return NULL
+    if (root->left == NULL && root->right == NULL) {
+      free(root);
+      return NULL;
+    }
+
+    // If the node has only one child, return the child
+    if (root->left == NULL) {
+      struct Node* temp = root->right;
+      free(root);
+      return temp;
+    } else if (root->right == NULL) {
+      struct Node* temp = root->left;
+      free(root);
+      return temp;
+    }
+
+    // If the node has two children, find the inorder successor and replace the node with the inorder successor
+    struct Node* successor = root->right;
+    while (successor->left != NULL) {
+      successor = successor->left;
+    }
